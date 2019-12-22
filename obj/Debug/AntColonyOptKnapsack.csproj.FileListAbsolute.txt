@@ -1,0 +1,7 @@
+C:\Users\ozgur\Desktop\AntColonyOptKnapsack\bin\Debug\AntColonyOptKnapsack.exe.config
+C:\Users\ozgur\Desktop\AntColonyOptKnapsack\bin\Debug\AntColonyOptKnapsack.exe
+C:\Users\ozgur\Desktop\AntColonyOptKnapsack\bin\Debug\AntColonyOptKnapsack.pdb
+C:\Users\ozgur\Desktop\AntColonyOptKnapsack\obj\Debug\AntColonyOptKnapsack.csprojAssemblyReference.cache
+C:\Users\ozgur\Desktop\AntColonyOptKnapsack\obj\Debug\AntColonyOptKnapsack.csproj.CoreCompileInputs.cache
+C:\Users\ozgur\Desktop\AntColonyOptKnapsack\obj\Debug\AntColonyOptKnapsack.exe
+C:\Users\ozgur\Desktop\AntColonyOptKnapsack\obj\Debug\AntColonyOptKnapsack.pdb
