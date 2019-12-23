@@ -8,18 +8,28 @@ namespace AntColonyOptKnapsack
 {
     class Karinca
     {
-        private int agirlik;
-        private int deger;
-        private int indis;
-        List<Esya> tabuListesi= new List<Esya>();
-
-        public Karinca()
+        List<Esya> esyalar = new List<Esya>();
+        List<int> tabuListesi = new List<int>();
+        Dictionary<int, double> secmeDurumu = new Dictionary<int, double>();
+        public Karinca(List<Esya> esyalar)
         {
-
+            Esyalar = esyalar;
         }
-        public int Agirlik { get => agirlik; set => agirlik = value; }
-        public int Deger { get => deger; set => deger = value; }
-        public int Indis { get => indis; set => indis = value; }
-        internal List<Esya> TabuListesi { get => tabuListesi; set => tabuListesi = value; }
+
+        // tabu listesinde olmayanlari dondurur
+        public List<Esya> Secilmemis()
+        {
+            List<Esya> secilmemis = new List<Esya>();
+
+            for (int i = 0; i < Esyalar.Count; i++)
+                // esyanin indisi tabu listesinde yoksa secilmemislere ekle
+                if (!TabuListesi.Contains(Esyalar[i].Indis))
+                    secilmemis.Add(Esyalar[i]);
+
+            return secilmemis;
+        }
+        public List<int> TabuListesi { get => tabuListesi; set => tabuListesi = value; }
+        internal List<Esya> Esyalar { get => esyalar; set => esyalar = value; }
+        public Dictionary<int, double> SecmeDurumu { get => secmeDurumu; set => secmeDurumu = value; }
     }
 }

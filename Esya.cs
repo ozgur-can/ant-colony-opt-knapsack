@@ -8,8 +8,8 @@ namespace AntColonyOptKnapsack
 {
     class Esya
     {
-        private int agirlik;
-        private int deger;
+        private double agirlik;
+        private double deger;
         private int indis;
         private double feromon;
         private double fayda;
@@ -24,8 +24,8 @@ namespace AntColonyOptKnapsack
             Fayda = Deger / Agirlik;
         }
 
-        public int Agirlik { get => agirlik; set => agirlik = value; }
-        public int Deger { get => deger; set => deger = value; }
+        public double Agirlik { get => agirlik; set => agirlik = value; }
+        public double Deger { get => deger; set => deger = value; }
         public int Indis { get => indis; set => indis = value; }
         public double Feromon { get => feromon; set => feromon = value; }
         public double Fayda { get => fayda; set => fayda = value; }
