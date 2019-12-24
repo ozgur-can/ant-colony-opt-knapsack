@@ -63,10 +63,6 @@ namespace AntColonyOptKnapsack
         // T feromon, N fayda => değer/ağırlık
         public void SecilmeDurumuHesapla()
         {
-            List<List<double>> secilmeDurumToplam = new List<List<double>>();
-            List<List<double>> durumToplam = new List<List<double>>();
-            double durum;
-
             for (int i = 0; i < Karincalar.Count; i++)
             {
                 //Console.WriteLine(i);
@@ -74,20 +70,14 @@ namespace AntColonyOptKnapsack
                 while (Karincalar[i].TabuListesi.Count < Esyalar.Count)
                 {
                     double pSum = 0;
-                    //List<double> tempPs = new List<double>();
                     Dictionary<int, double> indisVeProportion = new Dictionary<int, double>();
-                    Dictionary<int, double> output = new Dictionary<int, double>();
 
                     foreach (var secilmemis in Karincalar[i].Secilmemis())
                     {
-                        //tempPs.Add(secilmemis.Feromon * secilmemis.Fayda);
-                        //pSum += tempPs.Last();
-
                         indisVeProportion.Add(secilmemis.Indis, secilmemis.Feromon * secilmemis.Fayda);
                         pSum += indisVeProportion[secilmemis.Indis];
                     }
 
-                    int a = indisVeProportion.ToList().Count;
                     foreach (var element in indisVeProportion.ToList())
                     {
                         indisVeProportion[element.Key] = element.Value / pSum;
@@ -95,21 +85,9 @@ namespace AntColonyOptKnapsack
                     }
 
                     // en buyuk proportion'i olan esyayi o karincanin tabu listesine ekledik
-                    int secilecekEsya = indisVeProportion.Keys.Max();
+                    int secilecekEsya = indisVeProportion.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
                     Karincalar[i].TabuListesi.Add(secilecekEsya);
-
-
                 }
-
-                //for (int j = 0; j < Karincalar[i].Secilmemis().Count; j++)
-                //{
-                //    //ilgili esyanin secilmesi icin hesabi yaptik
-                //    durum = Esyalar[j].Feromon * Esyalar[j].Fayda;
-                //    Karincalar[i].SecmeDurumu[j] = durum;
-                //    //yaptigimiz hesabi o karıncanın durumToplam listesine ekledik
-                //    durumToplam[i].Add(durum);
-                //    secilmeDurumToplam[i].Add(0);
-                //}
             }
 
             for (int i = 0; i < Karincalar.Count; i++)
@@ -118,37 +96,6 @@ namespace AntColonyOptKnapsack
                     Console.WriteLine(Karincalar[i].TabuListesi[j]);
                 Console.WriteLine();
             }
-            ////her karınca icin bir tane durum listesi actik
-            //durumToplam.Add(new List<double>());
-            ////her karınca icin bir tane secilme durum listesi actik
-            //secilmeDurumToplam.Add(new List<double>());
-
-            //foreach (var el in Karincalar[i].Secilmemis())
-            //{
-
-            //}
-
-            Console.WriteLine("..");
-            //for (int i = 0; i < durumToplam.Count; i++)
-            //{
-            //    for (int j = 0; j < durumToplam[i].Count; j++)
-            //    {
-            //        // her esyanin secilme durumunu, durum(kendisi)/durum(toplam)
-            //        // ile bulduk
-            //        secilmeDurumToplam[i][j] = durumToplam[i][j] / durumToplam[i].Sum();
-            //    }
-            //}
-
-            //for (int i = 0; i < durumToplam.Count; i++)
-            //{
-            //    Console.WriteLine("i = " + i);
-            //    for (int j = 0; j < durumToplam[i].Count; j++)
-            //    {
-            //        Console.WriteLine("j = " + j + " * " + Math.Round(secilmeDurumToplam[i][j], 4) + " ");
-            //    }
-            //    Console.Write("\n");
-            //}
-
         }
 
         public int IterasyonSayisi { get => iterasyonSayisi; set => iterasyonSayisi = value; }
