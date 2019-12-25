@@ -10,15 +10,17 @@ namespace AntColonyOptKnapsack
     {
         private int iterasyonSayisi;
         private int karincaSayisi;
+        private int kapasite;
         private List<Esya> esyalar = new List<Esya>();
         List<Karinca> karincalar = new List<Karinca>();
         RastgeleSayi rastgeleSayi = new RastgeleSayi();
 
-        public KarincaKolonisi(int karincaSayisi, int iterasyonSayisi, List<Esya> esyalar)
+        public KarincaKolonisi(int karincaSayisi, int iterasyonSayisi, List<Esya> esyalar, int kapasite)
         {
             KarincaSayisi = karincaSayisi;
             IterasyonSayisi = iterasyonSayisi;
             Esyalar = esyalar;
+            Kapasite = kapasite;
             for (int i = 0; i < karincaSayisi; i++)
                 Karincalar.Add(new Karinca(esyalar));
 
@@ -37,32 +39,18 @@ namespace AntColonyOptKnapsack
 
         }
 
-        public void EsyaAta()
-        {
-            int sayac = 0;
-            // rulet tekerlegi ile diger esyalar atanacak
-
-            do
-            {
-
-
-            } while (sayac < IterasyonSayisi);
-
-        }
-
-
         // Karincanin basladigi yerden sonrasi icin
         // Tum esyalarin secilme durumlarini hesaplar
 
         // Feromon * Fayda / Tum(Feromon*Fayda)' yi hesapliyoruz
         // Esyalarin proportion degerine atayacagiz
         // T feromon, N fayda => değer/ağırlık
-        public void SecilmeDurumuHesapla()
+        public void Optimizasyon()
         {
             for (int i = 0; i < Karincalar.Count; i++)
             {
                 // karinca tum esyalari secene dek
-                while (Karincalar[i].TabuListesi.Count < Esyalar.Count)
+                while (Karincalar[i].CantaAgirligi() < Kapasite)
                 {
                     double pToplam = 0;
                     Dictionary<int, double> indisVeProportion = new Dictionary<int, double>();
@@ -80,7 +68,9 @@ namespace AntColonyOptKnapsack
 
                     // rulet ile yeni esyayi o karincanin tabu listesine ekledik
                     int secilecekEsya = RuletIleSecim(indisVeProportion);
-                    Karincalar[i].TabuListesi.Add(secilecekEsya);
+                    if (Esyalar[secilecekEsya].Agirlik + Karincalar[i].CantaAgirligi() <= Kapasite)
+                        Karincalar[i].TabuListesi.Add(secilecekEsya);
+                    else break;
                 }
             }
 
@@ -88,7 +78,7 @@ namespace AntColonyOptKnapsack
             {
                 for (int j = 0; j < Karincalar[i].TabuListesi.Count; j++)
                     Console.WriteLine(Karincalar[i].TabuListesi[j]);
-                Console.WriteLine();
+                Console.WriteLine("W = " + Karincalar[i].CantaAgirligi() + "\n");
             }
         }
 
@@ -124,5 +114,6 @@ namespace AntColonyOptKnapsack
         internal List<Karinca> Karincalar { get => karincalar; set => karincalar = value; }
         public int KarincaSayisi { get => karincaSayisi; set => karincaSayisi = value; }
         public RastgeleSayi RastgeleSayi { get => rastgeleSayi; set => rastgeleSayi = value; }
+        public int Kapasite { get => kapasite; set => kapasite = value; }
     }
 }

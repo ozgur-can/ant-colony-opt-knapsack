@@ -28,8 +28,21 @@ namespace AntColonyOptKnapsack
 
             return secilmemis;
         }
+        public double CantaAgirligi()
+        {
+            double toplam = 0;
+
+            foreach (var esya in TabuListesi)
+            {
+                toplam += Esyalar[esya].Agirlik;
+            }
+
+            return toplam;
+        }
+
         public List<int> TabuListesi { get => tabuListesi; set => tabuListesi = value; }
         internal List<Esya> Esyalar { get => esyalar; set => esyalar = value; }
         public Dictionary<int, double> SecmeDurumu { get => secmeDurumu; set => secmeDurumu = value; }
+
     }
 }

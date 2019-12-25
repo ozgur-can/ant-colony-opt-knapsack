@@ -16,12 +16,11 @@ namespace AntColonyOptKnapsack
             double BETA = 1;
 
             VeriOkuma veri = new VeriOkuma();
-            List<Esya> elemanList = veri.elemanlarListesi("test0.txt");
+            List<Esya> esyaList = veri.elemanlarListesi("test0.txt");
 
-            KarincaKolonisi karincaKolonisi = new KarincaKolonisi(karincaSayisi, ADIM_SAYISI, elemanList);
+            KarincaKolonisi karincaKolonisi = new KarincaKolonisi(karincaSayisi, ADIM_SAYISI, esyaList, veri.Kapasite);
             karincaKolonisi.IlkAtama();
-            karincaKolonisi.SecilmeDurumuHesapla();
-            //karincaKolonisi.EsyaAta();
+            karincaKolonisi.Optimizasyon();
             Console.ReadKey();
         }
     }
