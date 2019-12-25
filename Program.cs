@@ -10,15 +10,17 @@ namespace AntColonyOptKnapsack
     {
         static void Main(string[] args)
         {
-            int karincaSayisi = 5;
-            int ADIM_SAYISI = 10;
-            double ALFA = 1;
-            double BETA = 1;
+            int karincaSayisi = 100;
+            int ADIM_SAYISI = 100;
+            double ALFA = 0.2;
+            double BETA = 0.3;
+            double Q = 0.001;
+            double PHI = 0.2;
 
             VeriOkuma veri = new VeriOkuma();
-            List<Esya> esyaList = veri.elemanlarListesi("test0.txt");
+            List<Esya> esyaList = veri.elemanlarListesi("test1.txt");
 
-            KarincaKolonisi karincaKolonisi = new KarincaKolonisi(karincaSayisi, ADIM_SAYISI, esyaList, veri.Kapasite);
+            KarincaKolonisi karincaKolonisi = new KarincaKolonisi(karincaSayisi, ADIM_SAYISI, esyaList, veri.Kapasite, Q, PHI, ALFA, BETA);
             karincaKolonisi.IlkAtama();
             karincaKolonisi.Optimizasyon();
             Console.ReadKey();

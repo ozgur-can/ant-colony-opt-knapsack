@@ -21,7 +21,7 @@ namespace AntColonyOptKnapsack
             Deger = deger;
             Indis = indis;
             Feromon = 1;
-            Fayda = Deger / Agirlik;
+            Fayda = 1 / Agirlik;
         }
 
         public double Agirlik { get => agirlik; set => agirlik = value; }

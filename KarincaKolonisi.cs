@@ -8,6 +8,11 @@ namespace AntColonyOptKnapsack
 {
     class KarincaKolonisi
     {
+        private double alfa;
+        private double beta;
+        private double q;
+        private double phi;
+        private double globalMax = 0;
         private int iterasyonSayisi;
         private int karincaSayisi;
         private int kapasite;
@@ -15,12 +20,17 @@ namespace AntColonyOptKnapsack
         List<Karinca> karincalar = new List<Karinca>();
         RastgeleSayi rastgeleSayi = new RastgeleSayi();
 
-        public KarincaKolonisi(int karincaSayisi, int iterasyonSayisi, List<Esya> esyalar, int kapasite)
+        public KarincaKolonisi(int karincaSayisi, int iterasyonSayisi, List<Esya> esyalar, int kapasite, double q, double phi, double alfa, double beta)
         {
             KarincaSayisi = karincaSayisi;
             IterasyonSayisi = iterasyonSayisi;
             Esyalar = esyalar;
             Kapasite = kapasite;
+            Q = q;
+            Phi = phi;
+            Alfa = alfa;
+            Beta = beta;
+
             for (int i = 0; i < karincaSayisi; i++)
                 Karincalar.Add(new Karinca(esyalar));
 
@@ -47,38 +57,45 @@ namespace AntColonyOptKnapsack
         // T feromon, N fayda => değer/ağırlık
         public void Optimizasyon()
         {
-            for (int i = 0; i < Karincalar.Count; i++)
+            for (int step = 0; step < IterasyonSayisi; step++)
             {
-                // karinca tum esyalari secene dek
-                while (Karincalar[i].CantaAgirligi() < Kapasite)
+                for (int i = 0; i < Karincalar.Count; i++)
                 {
-                    double pToplam = 0;
-                    Dictionary<int, double> indisVeProportion = new Dictionary<int, double>();
-
-                    foreach (var secilmemis in Karincalar[i].Secilmemis())
+                    // karinca tum esyalari secene dek
+                    while (Karincalar[i].CantaDegeri() < Kapasite)
                     {
-                        indisVeProportion.Add(secilmemis.Indis, secilmemis.Feromon * secilmemis.Fayda);
-                        pToplam += indisVeProportion[secilmemis.Indis];
-                    }
+                        double pToplam = 0;
+                        Dictionary<int, double> indisVeProportion = new Dictionary<int, double>();
 
-                    foreach (var element in indisVeProportion.ToList())
-                    {
-                        indisVeProportion[element.Key] = element.Value / pToplam;
-                    }
+                        foreach (var secilmemis in Karincalar[i].Secilmemis())
+                        {
+                            indisVeProportion.Add(secilmemis.Indis, Math.Pow(secilmemis.Feromon, Alfa) * Math.Pow(secilmemis.Fayda, Beta));
+                            pToplam += indisVeProportion[secilmemis.Indis];
+                        }
 
-                    // rulet ile yeni esyayi o karincanin tabu listesine ekledik
-                    int secilecekEsya = RuletIleSecim(indisVeProportion);
-                    if (Esyalar[secilecekEsya].Agirlik + Karincalar[i].CantaAgirligi() <= Kapasite)
-                        Karincalar[i].TabuListesi.Add(secilecekEsya);
-                    else break;
+                        foreach (var element in indisVeProportion.ToList())
+                        {
+                            // eski hali => indisVeProportion[element.Key] = element.Value / pToplam
+                            indisVeProportion[element.Key] = (1 - (element.Value / pToplam)) / (indisVeProportion.Count - 1);
+                        }
+
+                        // rulet ile yeni esyayi o karincanin tabu listesine ekledik
+                        int secilecekEsya = RuletIleSecim(indisVeProportion);
+                        if (Esyalar[secilecekEsya].Agirlik + Karincalar[i].CantaAgirligi() <= Kapasite)
+                            Karincalar[i].TabuListesi.Add(secilecekEsya);
+                        else break;
+                    }
                 }
+                FeromonGuncelle();
             }
 
+            Console.WriteLine(GlobalMaxBul());
+
             for (int i = 0; i < Karincalar.Count; i++)
             {
-                for (int j = 0; j < Karincalar[i].TabuListesi.Count; j++)
-                    Console.WriteLine(Karincalar[i].TabuListesi[j]);
-                Console.WriteLine("W = " + Karincalar[i].CantaAgirligi() + "\n");
+                //for (int j = 0; j < Karincalar[i].TabuListesi.Count; j++)
+                //   Console.WriteLine(Karincalar[i].TabuListesi[j]);
+                Console.WriteLine("W = " + Karincalar[i].CantaDegeri() + "\n");
             }
         }
 
@@ -109,11 +126,62 @@ namespace AntColonyOptKnapsack
             return secilecekEsya;
         }
 
+        public double GlobalMaxBul()
+        {
+            for (int i = 0; i < Karincalar.Count; i++)
+            {
+                double localmax = 0;
+                if (localmax < Karincalar[i].CantaDegeri())
+                    localmax = Karincalar[i].CantaDegeri();
+
+                if (GlobalMax < localmax)
+                    GlobalMax = localmax;
+            }
+
+            return GlobalMax;
+        }
+
+        public void FeromonGuncelle()
+        {
+            double G;
+            double pheDegisim;
+            double pheToplam = 0;
+
+            for (int i = 0; i < Karincalar.Count; i++)
+            {
+                G = Q / Karincalar[i].CantaAgirligi();
+                for (int j = 0; j < Karincalar[i].TabuListesi.Count; j++)
+                {
+                    int guncellenecekEsya = Karincalar[i].TabuListesi[j];
+                    pheToplam += Esyalar[guncellenecekEsya].Agirlik * G;
+                }
+            }
+
+            //G=Q/karıncanın agırlıgı
+            //feromon degişimi= esyanın agırlıgı*G
+            //Feromon=(1-phi)*eski feromon+deromon değişimi
+            for (int i = 0; i < Karincalar.Count; i++)
+            {
+                G = Q / Karincalar[i].CantaAgirligi();
+                for (int j = 0; j < Karincalar[i].TabuListesi.Count; j++)
+                {
+                    int guncellenecekEsya = Karincalar[i].TabuListesi[j];
+                    pheDegisim = Esyalar[guncellenecekEsya].Agirlik * G / pheToplam;
+                    Esyalar[guncellenecekEsya].Feromon = (1 - Phi) * Esyalar[guncellenecekEsya].Feromon + pheDegisim;
+                }
+            }
+        }
+
         public int IterasyonSayisi { get => iterasyonSayisi; set => iterasyonSayisi = value; }
         internal List<Esya> Esyalar { get => esyalar; set => esyalar = value; }
         internal List<Karinca> Karincalar { get => karincalar; set => karincalar = value; }
         public int KarincaSayisi { get => karincaSayisi; set => karincaSayisi = value; }
         public RastgeleSayi RastgeleSayi { get => rastgeleSayi; set => rastgeleSayi = value; }
         public int Kapasite { get => kapasite; set => kapasite = value; }
+        public double GlobalMax { get => globalMax; set => globalMax = value; }
+        public double Q { get => q; set => q = value; }
+        public double Phi { get => phi; set => phi = value; }
+        public double Alfa { get => alfa; set => alfa = value; }
+        public double Beta { get => beta; set => beta = value; }
     }
 }
