@@ -12,6 +12,7 @@ namespace AntColonyOptKnapsack
         private int karincaSayisi;
         private List<Esya> esyalar = new List<Esya>();
         List<Karinca> karincalar = new List<Karinca>();
+        RastgeleSayi rastgeleSayi = new RastgeleSayi();
 
         public KarincaKolonisi(int karincaSayisi, int iterasyonSayisi, List<Esya> esyalar)
         {
@@ -25,13 +26,12 @@ namespace AntColonyOptKnapsack
 
         public void IlkAtama()
         {
-            RastgeleSayi rastgeleSayi = new RastgeleSayi();
             int sayi;
 
             // karinca ilk esyayi secti
             for (int i = 0; i < Karincalar.Count; i++)
             {
-                sayi = rastgeleSayi.Between(0, Esyalar.Count - 1);
+                sayi = RastgeleSayi.Between(0, Esyalar.Count);
                 Karincalar[i].TabuListesi.Add(sayi);
             }
 
@@ -50,10 +50,6 @@ namespace AntColonyOptKnapsack
 
         }
 
-        public int SecilmeOrani() // Proportion
-        {
-            return 0;
-        }
 
         // Karincanin basladigi yerden sonrasi icin
         // Tum esyalarin secilme durumlarini hesaplar
@@ -65,27 +61,25 @@ namespace AntColonyOptKnapsack
         {
             for (int i = 0; i < Karincalar.Count; i++)
             {
-                //Console.WriteLine(i);
                 // karinca tum esyalari secene dek
                 while (Karincalar[i].TabuListesi.Count < Esyalar.Count)
                 {
-                    double pSum = 0;
+                    double pToplam = 0;
                     Dictionary<int, double> indisVeProportion = new Dictionary<int, double>();
 
                     foreach (var secilmemis in Karincalar[i].Secilmemis())
                     {
                         indisVeProportion.Add(secilmemis.Indis, secilmemis.Feromon * secilmemis.Fayda);
-                        pSum += indisVeProportion[secilmemis.Indis];
+                        pToplam += indisVeProportion[secilmemis.Indis];
                     }
 
                     foreach (var element in indisVeProportion.ToList())
                     {
-                        indisVeProportion[element.Key] = element.Value / pSum;
-                        Console.WriteLine(indisVeProportion[element.Key] + "\n");
+                        indisVeProportion[element.Key] = element.Value / pToplam;
                     }
 
-                    // en buyuk proportion'i olan esyayi o karincanin tabu listesine ekledik
-                    int secilecekEsya = indisVeProportion.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+                    // rulet ile yeni esyayi o karincanin tabu listesine ekledik
+                    int secilecekEsya = RuletIleSecim(indisVeProportion);
                     Karincalar[i].TabuListesi.Add(secilecekEsya);
                 }
             }
@@ -98,9 +92,37 @@ namespace AntColonyOptKnapsack
             }
         }
 
+        // karincanin secebilecegi esyalari rulete atip ruletten hangisini sececegine karar ver
+        public int RuletIleSecim(Dictionary<int, double> indisProp)
+        {
+            // dictionary'deki degerleri artan sirada siraladik
+            var siraliIndisProp = indisProp.ToList();
+            siraliIndisProp.Sort((x, y) => x.Value.CompareTo(y.Value));
+
+            double toplam = 0;
+            Dictionary<int, double> toplamList = new Dictionary<int, double>();
+
+            for (int i = 0; i < siraliIndisProp.Count; i++)
+            {
+                for (int j = i; j <= i; j++)
+                    toplam += siraliIndisProp[j].Value;
+                //dictionary'nin indisiyle beraber ekliyoruz
+                toplamList.Add(siraliIndisProp[i].Key, toplam);
+            }
+
+            // 0 ile 1 arasinda sayi tuttuk
+            double sayi = RastgeleSayi.BetweenDouble(0, 2);
+
+            // tutulan sayi, hangi rulet araliginda kaliyorsa o indisi tutuyoruz
+            int secilecekEsya = toplamList.Aggregate((x, y) => x.Value < sayi && y.Value > sayi ? y : x).Key;
+
+            return secilecekEsya;
+        }
+
         public int IterasyonSayisi { get => iterasyonSayisi; set => iterasyonSayisi = value; }
         internal List<Esya> Esyalar { get => esyalar; set => esyalar = value; }
         internal List<Karinca> Karincalar { get => karincalar; set => karincalar = value; }
         public int KarincaSayisi { get => karincaSayisi; set => karincaSayisi = value; }
+        public RastgeleSayi RastgeleSayi { get => rastgeleSayi; set => rastgeleSayi = value; }
     }
 }

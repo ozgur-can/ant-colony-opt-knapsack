@@ -11,6 +11,7 @@ namespace AntColonyOptKnapsack
     {
         private readonly RNGCryptoServiceProvider _generator = new RNGCryptoServiceProvider();
 
+        // min, max arasinda sayi uretir max dahil degil
         public int Between(int minimumValue, int maximumValue)
         {
             byte[] randomNumber = new byte[1];
@@ -25,13 +26,14 @@ namespace AntColonyOptKnapsack
             double multiplier = Math.Max(0, (asciiValueOfRandomCharacter / 255d) - 0.00000000001d);
 
             // We need to add one to the range, to allow for the rounding done with Math.Floor
-            int range = maximumValue - minimumValue + 1;
+            int range = maximumValue - minimumValue;
 
             double randomValueInRange = Math.Floor(multiplier * range);
 
             return (int)(minimumValue + randomValueInRange);
         }
 
+        // min, max arasinda sayi uretir max dahil degil
         public double BetweenDouble(double minimumValue, double maximumValue)
         {
             byte[] randomNumber = new byte[1];
@@ -46,7 +48,7 @@ namespace AntColonyOptKnapsack
             double multiplier = Math.Max(0, (asciiValueOfRandomCharacter / 255d) - 0.00000000001d);
 
             // We need to add one to the range, to allow for the rounding done with Math.Floor
-            double range = maximumValue - minimumValue;
+            double range = maximumValue - minimumValue - 1;
 
             double randomValueInRange = multiplier * range;
 
