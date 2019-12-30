@@ -53,11 +53,12 @@ namespace KarincaKolonisiKnapsack01
 
             IlkAtama();
 
-            double globalBest = 0;
+            double globalEnIyiDeger = 0;
+            double localEnIyiDeger = 0;
 
             for (int step = 0; step < IterasyonSayisi; step++)
             {
-                double localBest = 0;
+                localEnIyiDeger = 0;
                 for (int i = 0; i < Karincalar.Count; i++)
                 {
                     // karincanin cantasi boşsa
@@ -80,12 +81,13 @@ namespace KarincaKolonisiKnapsack01
                         int secilecek = RuletIleSecim(indisVeProportion);
                         Karincalar[i].TabuListesi.Add(secilecek);
                     }
-                    if (localBest < Karincalar[i].CantaDegeri())
-                        localBest = Karincalar[i].CantaDegeri();
+
+                    if (localEnIyiDeger < Karincalar[i].CantaDegeri())
+                        localEnIyiDeger = Karincalar[i].CantaDegeri();
                 }
 
-                if (globalBest < localBest)
-                    globalBest = localBest;
+                if (globalEnIyiDeger < localEnIyiDeger)
+                    globalEnIyiDeger = localEnIyiDeger;
 
                 FeromonGuncelle();
             }
@@ -93,11 +95,10 @@ namespace KarincaKolonisiKnapsack01
             //sure bitis
             TimeSpan zamanFarki = DateTime.Now - sureBas;
 
-            EnIyiCozumlerListesi.Add(globalBest);
+            EnIyiCozumlerListesi.Add(globalEnIyiDeger);
             ZamanFarklariListesi.Add(zamanFarki);
 
-            //*
-            Console.WriteLine("global = " + globalBest + "time = " + zamanFarki.TotalMilliseconds);
+            Console.WriteLine(" " + globalEnIyiDeger + " " + zamanFarki.TotalMilliseconds);
         }
 
         // karincanin secebilecegi esyalari rulete atip ruletten hangisini sececegine karar ver
@@ -137,7 +138,6 @@ namespace KarincaKolonisiKnapsack01
 
             for (int i = 0; i < Karincalar.Count; i++)
             {
-                //G = Q / Karincalar[i].CantaAgirligi();
                 for (int j = 0; j < Karincalar[i].TabuListesi.Count; j++)
                 {
                     guncellenecekEsya = Karincalar[i].TabuListesi[j];
@@ -147,7 +147,7 @@ namespace KarincaKolonisiKnapsack01
             }
         }
 
-        public void CiktiVer(List<double> enIyiCozum, List<TimeSpan> zamanFarki, string dosyaAdi)
+        public void CiktiVer(List<double> enIyiCozum, List<TimeSpan> zamanFarki, string dosyaAdi, DosyayaYazdir dosya)
         {
             // dosya yazma islemleri
             Dictionary<double, TimeSpan> ciktilar = new Dictionary<double, TimeSpan>();
@@ -166,7 +166,6 @@ namespace KarincaKolonisiKnapsack01
             double enIyiCiktiDegeri = ciktilar.Keys.Max();
             TimeSpan enIyiCiktiSuresi = ciktilar[enIyiCiktiDegeri];
 
-            DosyayaYazdir dosya = new DosyayaYazdir();
             dosya.Yaz(dosyaAdi, ortalamaDeger, enIyiCiktiDegeri, enIyiCiktiSuresi);
         }
 

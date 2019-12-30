@@ -54,6 +54,5 @@ namespace KarincaKolonisiKnapsack01
         public List<int> TabuListesi { get => tabuListesi; set => tabuListesi = value; }
         internal List<Esya> Esyalar { get => esyalar; set => esyalar = value; }
         public Dictionary<int, double> SecmeDurumu { get => secmeDurumu; set => secmeDurumu = value; }
-
     }
 }

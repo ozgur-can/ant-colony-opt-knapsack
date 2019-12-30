@@ -22,8 +22,9 @@ namespace KarincaKolonisiKnapsack01
             //double Q = 100;
 
             VeriOkuma veri = new VeriOkuma();
+            DosyayaYazdir dosya = new DosyayaYazdir();
 
-            for (int i = 1; i <= 1; i++)
+            for (int i = 1; i <= 3; i++)
             {
                 string dosyaYolu = Path.Combine(Environment.CurrentDirectory, @"Input\", "test" + i + ".txt");
                 string ciktiDosyaYolu = Path.Combine(Environment.CurrentDirectory, @"Output\", "test" + i + "_4_results.txt");
@@ -39,7 +40,7 @@ namespace KarincaKolonisiKnapsack01
                     karincaKolonisi.Optimizasyon();
 
                     if (j == DENEME_SAYISI - 1)
-                        karincaKolonisi.CiktiVer(karincaKolonisi.EnIyiCozumlerListesi, karincaKolonisi.ZamanFarklariListesi, ciktiDosyaYolu);
+                        karincaKolonisi.CiktiVer(karincaKolonisi.EnIyiCozumlerListesi, karincaKolonisi.ZamanFarklariListesi, ciktiDosyaYolu, dosya);
                 }
             }
 
