@@ -23,7 +23,7 @@ namespace KarincaKolonisiKnapsack01
 
             VeriOkuma veri = new VeriOkuma();
 
-            for (int i = 1; i <= 10; i++)
+            for (int i = 1; i <= 1; i++)
             {
                 string dosyaYolu = Path.Combine(Environment.CurrentDirectory, @"Input\", "test" + i + ".txt");
                 string ciktiDosyaYolu = Path.Combine(Environment.CurrentDirectory, @"Output\", "test" + i + "_4_results.txt");

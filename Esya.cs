@@ -22,8 +22,8 @@ namespace KarincaKolonisiKnapsack01
             Indis = indis;
             KnapsackKapasitesi = knapsackKapasitesi;
             Feromon = 1;
-            //Cazibe = Deger / (Agirlik / knapsackKapasitesi);
-            Cazibe = Deger / (Math.Pow(Agirlik, 2));
+            //Cazibe = Deger / (Agirlik / knapsackKapasitesi); // AKA3
+            Cazibe = Deger / (Math.Pow(Agirlik, 2)); // AKA2
         }
 
         public double Agirlik { get => agirlik; set => agirlik = value; }

@@ -54,13 +54,13 @@ namespace KarincaKolonisiKnapsack01
             IlkAtama();
 
             double globalBest = 0;
-            double enKucukEsyaninAgirligi = Esyalar.Aggregate((x, y) => x.Agirlik < y.Agirlik ? x : y).Agirlik;
 
             for (int step = 0; step < IterasyonSayisi; step++)
             {
                 double localBest = 0;
                 for (int i = 0; i < Karincalar.Count; i++)
                 {
+                    // karincanin cantasi boşsa
                     while (Kapasite - Karincalar[i].CantaAgirligi() >= 0)
                     {
                         double pToplam = 0;
@@ -77,7 +77,6 @@ namespace KarincaKolonisiKnapsack01
                             indisVeProportion[element.Key] = element.Value / pToplam;
                         }
 
-                        //int maxValIndex = indisVeProportion.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
                         int secilecek = RuletIleSecim(indisVeProportion);
                         Karincalar[i].TabuListesi.Add(secilecek);
                     }
@@ -130,20 +129,20 @@ namespace KarincaKolonisiKnapsack01
 
         public void FeromonGuncelle()
         {
-            double pheDegisim;
+            double feromonDegisim = 0;
+            int guncellenecekEsya = 0;
 
-            //G=Q/karıncanın agırlıgı
-            //feromon degişimi= esyanın agırlıgı*G
-            //Feromon=(1-phi)*eski feromon+feromon değişimi
+            // enIyiEsyaninDegeri = bestZ
+            double enIyiEsyaninDegeri = Karincalar[0].Esyalar.Aggregate((x, y) => x.Deger > y.Deger ? x : y).Deger;
+
             for (int i = 0; i < Karincalar.Count; i++)
             {
                 //G = Q / Karincalar[i].CantaAgirligi();
                 for (int j = 0; j < Karincalar[i].TabuListesi.Count; j++)
                 {
-                    int guncellenecekEsya = Karincalar[i].TabuListesi[j];
-                    double bestZ = Karincalar[i].Esyalar.Aggregate((x, y) => x.Deger > y.Deger ? x : y).Deger;
-                    pheDegisim = 1 / (1 + (bestZ - Esyalar[guncellenecekEsya].Deger) / bestZ);
-                    Esyalar[guncellenecekEsya].Feromon = (1 - Phi) * Esyalar[guncellenecekEsya].Feromon + pheDegisim;
+                    guncellenecekEsya = Karincalar[i].TabuListesi[j];
+                    feromonDegisim = 1 / (1 + (enIyiEsyaninDegeri - Esyalar[guncellenecekEsya].Deger) / enIyiEsyaninDegeri);
+                    Esyalar[guncellenecekEsya].Feromon = (1 - Phi) * Esyalar[guncellenecekEsya].Feromon + feromonDegisim;
                 }
             }
         }
