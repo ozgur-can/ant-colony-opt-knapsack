@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace AntColonyOptKnapsack
+namespace KarincaKolonisiKnapsack01
 {
     class Esya
     {
@@ -12,23 +11,27 @@ namespace AntColonyOptKnapsack
         private double deger;
         private int indis;
         private double feromon;
-        private double fayda;
+        private double cazibe;
         private double proportion;
+        private double knapsackKapasitesi;
 
-        public Esya(int agirlik, int deger, int indis)
+        public Esya(int agirlik, int deger, int indis, double knapsackKapasitesi)
         {
             Agirlik = agirlik;
             Deger = deger;
             Indis = indis;
+            KnapsackKapasitesi = knapsackKapasitesi;
             Feromon = 1;
-            Fayda = 1 / Agirlik;
+            //Cazibe = Deger / (Agirlik / knapsackKapasitesi);
+            Cazibe = Deger / (Math.Pow(Agirlik, 2));
         }
 
         public double Agirlik { get => agirlik; set => agirlik = value; }
         public double Deger { get => deger; set => deger = value; }
         public int Indis { get => indis; set => indis = value; }
         public double Feromon { get => feromon; set => feromon = value; }
-        public double Fayda { get => fayda; set => fayda = value; }
         public double Proportion { get => proportion; set => proportion = value; }
+        public double Cazibe { get => cazibe; set => cazibe = value; }
+        public double KnapsackKapasitesi { get => knapsackKapasitesi; set => knapsackKapasitesi = value; }
     }
 }

@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace AntColonyOptKnapsack
+namespace KarincaKolonisiKnapsack01
 {
     class VeriOkuma
     {
@@ -42,7 +41,7 @@ namespace AntColonyOptKnapsack
 
             for (int j = 0; j < agirlik.Count; j++)
             {
-                elemanlar.Add(new Esya(agirlik[j], deger[j], j));
+                elemanlar.Add(new Esya(agirlik[j], deger[j], j, Kapasite));
             }
             return elemanlar;
         }

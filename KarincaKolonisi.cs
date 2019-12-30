@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace AntColonyOptKnapsack
+namespace KarincaKolonisiKnapsack01
 {
     class KarincaKolonisi
     {
         private double alfa;
         private double beta;
-        private double q;
         private double phi;
         private double globalMax = 0;
         private int iterasyonSayisi;
@@ -19,21 +17,21 @@ namespace AntColonyOptKnapsack
         private List<Esya> esyalar = new List<Esya>();
         List<Karinca> karincalar = new List<Karinca>();
         RastgeleSayi rastgeleSayi = new RastgeleSayi();
+        List<double> enIyiCozumlerListesi = new List<double>();
+        List<TimeSpan> zamanFarklariListesi = new List<TimeSpan>();
 
-        public KarincaKolonisi(int karincaSayisi, int iterasyonSayisi, List<Esya> esyalar, int kapasite, double q, double phi, double alfa, double beta)
+        public KarincaKolonisi(int karincaSayisi, int iterasyonSayisi, List<Esya> esyalar, int kapasite, double phi, double alfa, double beta)
         {
             KarincaSayisi = karincaSayisi;
             IterasyonSayisi = iterasyonSayisi;
             Esyalar = esyalar;
             Kapasite = kapasite;
-            Q = q;
             Phi = phi;
             Alfa = alfa;
             Beta = beta;
 
             for (int i = 0; i < karincaSayisi; i++)
                 Karincalar.Add(new Karinca(esyalar));
-
         }
 
         public void IlkAtama()
@@ -46,57 +44,61 @@ namespace AntColonyOptKnapsack
                 sayi = RastgeleSayi.Between(0, Esyalar.Count);
                 Karincalar[i].TabuListesi.Add(sayi);
             }
-
         }
 
-        // Karincanin basladigi yerden sonrasi icin
-        // Tum esyalarin secilme durumlarini hesaplar
-
-        // Feromon * Fayda / Tum(Feromon*Fayda)' yi hesapliyoruz
-        // Esyalarin proportion degerine atayacagiz
-        // T feromon, N fayda => değer/ağırlık
         public void Optimizasyon()
         {
+            //sure baslangic
+            DateTime sureBas = DateTime.Now;
+
+            IlkAtama();
+
+            double globalBest = 0;
+            double enKucukEsyaninAgirligi = Esyalar.Aggregate((x, y) => x.Agirlik < y.Agirlik ? x : y).Agirlik;
+
             for (int step = 0; step < IterasyonSayisi; step++)
             {
+                double localBest = 0;
                 for (int i = 0; i < Karincalar.Count; i++)
                 {
-                    // karinca tum esyalari secene dek
-                    while (Karincalar[i].CantaDegeri() < Kapasite)
+                    while (Kapasite - Karincalar[i].CantaAgirligi() >= 0)
                     {
                         double pToplam = 0;
                         Dictionary<int, double> indisVeProportion = new Dictionary<int, double>();
 
                         foreach (var secilmemis in Karincalar[i].Secilmemis())
                         {
-                            indisVeProportion.Add(secilmemis.Indis, Math.Pow(secilmemis.Feromon, Alfa) * Math.Pow(secilmemis.Fayda, Beta));
+                            indisVeProportion.Add(secilmemis.Indis, Math.Pow(secilmemis.Feromon, Alfa) * Math.Pow(secilmemis.Cazibe, Beta));
                             pToplam += indisVeProportion[secilmemis.Indis];
                         }
 
                         foreach (var element in indisVeProportion.ToList())
                         {
-                            // eski hali => indisVeProportion[element.Key] = element.Value / pToplam
-                            indisVeProportion[element.Key] = (1 - (element.Value / pToplam)) / (indisVeProportion.Count - 1);
+                            indisVeProportion[element.Key] = element.Value / pToplam;
                         }
 
-                        // rulet ile yeni esyayi o karincanin tabu listesine ekledik
-                        int secilecekEsya = RuletIleSecim(indisVeProportion);
-                        if (Esyalar[secilecekEsya].Agirlik + Karincalar[i].CantaAgirligi() <= Kapasite)
-                            Karincalar[i].TabuListesi.Add(secilecekEsya);
-                        else break;
+                        //int maxValIndex = indisVeProportion.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+                        int secilecek = RuletIleSecim(indisVeProportion);
+                        Karincalar[i].TabuListesi.Add(secilecek);
                     }
+                    if (localBest < Karincalar[i].CantaDegeri())
+                        localBest = Karincalar[i].CantaDegeri();
                 }
+
+                if (globalBest < localBest)
+                    globalBest = localBest;
+
                 FeromonGuncelle();
             }
 
-            Console.WriteLine(GlobalMaxBul());
+            //sure bitis
+            TimeSpan zamanFarki = DateTime.Now - sureBas;
 
-            for (int i = 0; i < Karincalar.Count; i++)
-            {
-                //for (int j = 0; j < Karincalar[i].TabuListesi.Count; j++)
-                //   Console.WriteLine(Karincalar[i].TabuListesi[j]);
-                Console.WriteLine("W = " + Karincalar[i].CantaDegeri() + "\n");
-            }
+            EnIyiCozumlerListesi.Add(globalBest);
+            ZamanFarklariListesi.Add(zamanFarki);
+
+            //*
+            Console.WriteLine("global = " + globalBest + "time = " + zamanFarki.TotalMilliseconds);
         }
 
         // karincanin secebilecegi esyalari rulete atip ruletten hangisini sececegine karar ver
@@ -126,50 +128,47 @@ namespace AntColonyOptKnapsack
             return secilecekEsya;
         }
 
-        public double GlobalMaxBul()
-        {
-            for (int i = 0; i < Karincalar.Count; i++)
-            {
-                double localmax = 0;
-                if (localmax < Karincalar[i].CantaDegeri())
-                    localmax = Karincalar[i].CantaDegeri();
-
-                if (GlobalMax < localmax)
-                    GlobalMax = localmax;
-            }
-
-            return GlobalMax;
-        }
-
         public void FeromonGuncelle()
         {
-            double G;
             double pheDegisim;
-            double pheToplam = 0;
-
-            for (int i = 0; i < Karincalar.Count; i++)
-            {
-                G = Q / Karincalar[i].CantaAgirligi();
-                for (int j = 0; j < Karincalar[i].TabuListesi.Count; j++)
-                {
-                    int guncellenecekEsya = Karincalar[i].TabuListesi[j];
-                    pheToplam += Esyalar[guncellenecekEsya].Agirlik * G;
-                }
-            }
 
             //G=Q/karıncanın agırlıgı
             //feromon degişimi= esyanın agırlıgı*G
-            //Feromon=(1-phi)*eski feromon+deromon değişimi
+            //Feromon=(1-phi)*eski feromon+feromon değişimi
             for (int i = 0; i < Karincalar.Count; i++)
             {
-                G = Q / Karincalar[i].CantaAgirligi();
+                //G = Q / Karincalar[i].CantaAgirligi();
                 for (int j = 0; j < Karincalar[i].TabuListesi.Count; j++)
                 {
                     int guncellenecekEsya = Karincalar[i].TabuListesi[j];
-                    pheDegisim = Esyalar[guncellenecekEsya].Agirlik * G / pheToplam;
+                    double bestZ = Karincalar[i].Esyalar.Aggregate((x, y) => x.Deger > y.Deger ? x : y).Deger;
+                    pheDegisim = 1 / (1 + (bestZ - Esyalar[guncellenecekEsya].Deger) / bestZ);
                     Esyalar[guncellenecekEsya].Feromon = (1 - Phi) * Esyalar[guncellenecekEsya].Feromon + pheDegisim;
                 }
             }
+        }
+
+        public void CiktiVer(List<double> enIyiCozum, List<TimeSpan> zamanFarki, string dosyaAdi)
+        {
+            // dosya yazma islemleri
+            Dictionary<double, TimeSpan> ciktilar = new Dictionary<double, TimeSpan>();
+            double toplamDeger = 0, ortalamaDeger;
+
+            for (int i = 0; i < enIyiCozum.Count; i++)
+            {
+                ciktilar.Add(enIyiCozum[i], zamanFarki[i]);
+            }
+
+            for (int i = 0; i < ciktilar.Count; i++)
+                toplamDeger += ciktilar.ElementAt(i).Key;
+
+            ortalamaDeger = toplamDeger / ciktilar.Count;
+
+            double enIyiCiktiDegeri = ciktilar.Keys.Max();
+            TimeSpan enIyiCiktiSuresi = ciktilar[enIyiCiktiDegeri];
+
+            DosyayaYazdir dosya = new DosyayaYazdir();
+            dosya.Yaz(dosyaAdi, ortalamaDeger, enIyiCiktiDegeri, enIyiCiktiSuresi);
         }
 
         public int IterasyonSayisi { get => iterasyonSayisi; set => iterasyonSayisi = value; }
@@ -179,9 +178,10 @@ namespace AntColonyOptKnapsack
         public RastgeleSayi RastgeleSayi { get => rastgeleSayi; set => rastgeleSayi = value; }
         public int Kapasite { get => kapasite; set => kapasite = value; }
         public double GlobalMax { get => globalMax; set => globalMax = value; }
-        public double Q { get => q; set => q = value; }
         public double Phi { get => phi; set => phi = value; }
         public double Alfa { get => alfa; set => alfa = value; }
         public double Beta { get => beta; set => beta = value; }
+        public List<double> EnIyiCozumlerListesi { get => enIyiCozumlerListesi; set => enIyiCozumlerListesi = value; }
+        public List<TimeSpan> ZamanFarklariListesi { get => zamanFarklariListesi; set => zamanFarklariListesi = value; }
     }
 }

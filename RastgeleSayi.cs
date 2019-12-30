@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace AntColonyOptKnapsack
+namespace KarincaKolonisiKnapsack01
 {
     public class RastgeleSayi
     {
