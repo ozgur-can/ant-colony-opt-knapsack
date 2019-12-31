@@ -14,6 +14,7 @@ namespace KarincaKolonisiKnapsack01
         private int iterasyonSayisi;
         private int karincaSayisi;
         private int kapasite;
+        private double enHafifEsya;
         private List<Esya> esyalar = new List<Esya>();
         List<Karinca> karincalar = new List<Karinca>();
         RastgeleSayi rastgeleSayi = new RastgeleSayi();
@@ -29,6 +30,9 @@ namespace KarincaKolonisiKnapsack01
             Phi = phi;
             Alfa = alfa;
             Beta = beta;
+
+            // Agirligi en kucuk esyayi fonksiyonda kullanmak icin tuttuk
+            EnHafifEsya = Esyalar.Aggregate((x, y) => x.Agirlik < y.Agirlik ? x : y).Agirlik;
 
             for (int i = 0; i < karincaSayisi; i++)
                 Karincalar.Add(new Karinca(esyalar));
@@ -61,8 +65,8 @@ namespace KarincaKolonisiKnapsack01
                 localEnIyiDeger = 0;
                 for (int i = 0; i < Karincalar.Count; i++)
                 {
-                    // karincanin cantasi boşsa
-                    while (Kapasite - Karincalar[i].CantaAgirligi() >= 0)
+                    // karincanin cantasinda hala yer varsa
+                    while (Kapasite - Karincalar[i].CantaAgirligi() >= EnHafifEsya)
                     {
                         double pToplam = 0;
                         Dictionary<int, double> indisVeProportion = new Dictionary<int, double>();
@@ -181,5 +185,6 @@ namespace KarincaKolonisiKnapsack01
         public double Beta { get => beta; set => beta = value; }
         public List<double> EnIyiCozumlerListesi { get => enIyiCozumlerListesi; set => enIyiCozumlerListesi = value; }
         public List<TimeSpan> ZamanFarklariListesi { get => zamanFarklariListesi; set => zamanFarklariListesi = value; }
+        public double EnHafifEsya { get => enHafifEsya; set => enHafifEsya = value; }
     }
 }
